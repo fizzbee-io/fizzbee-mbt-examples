@@ -9,21 +9,13 @@ role Counter:
         self.value = 0
 
     atomic action Inc:
-        if self.value < MAX:
-            self.value += 1
-        else:
-            # with explicit pass, Inc becomes a NoOp after it reaches MAX
-            # without the pass, Inc will be considered disabled after it reaches MAX
-            pass
+        self.value = min(self.value + 1, MAX)
 
     atomic action Get:
         return self.value
 
     atomic action Dec:
-        if self.value > 0:
-            self.value -= 1
-        else:
-            pass
+        self.value = max(self.value - 1, 0)
 
 action Init:
     counter = Counter()
