@@ -1,0 +1,33 @@
+# counter.fizz
+#
+# A simple counter that can be incremented and decremented
+# Inc and Dec will be a no-op after value reaches the MAX or 0 respectively
+
+MAX = 3
+role Counter:
+    action Init:
+        self.value = 0
+
+    atomic action Inc:
+        if self.value < MAX:
+            self.value += 1
+        else:
+            # with explicit pass, Inc becomes a NoOp after it reaches MAX
+            # without the pass, Inc will be considered disabled after it reaches MAX
+            pass
+
+    atomic action Get:
+        return self.value
+
+    atomic action Dec:
+        if self.value > 0:
+            self.value -= 1
+        else:
+            pass
+
+action Init:
+    counter = Counter()
+
+always assertion WithinRange:
+    # return counter.value >= 0 and counter.value <= MAX
+    return counter.value in range(0, MAX+1)
