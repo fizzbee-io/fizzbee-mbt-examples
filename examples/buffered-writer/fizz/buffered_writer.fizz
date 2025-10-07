@@ -1,0 +1,23 @@
+---
+action_options:
+    "Writer.Append":
+        max_actions: 4
+---
+role Writer:
+    action Init:
+        self.flushed = []
+        self.buffered = []
+
+    atomic action Append:
+        x = any range(5)
+        self.buffered.append(x)
+
+    atomic action Flush:
+        self.flushed.extend(self.buffered)
+        self.buffered.clear()
+
+    #atomic action GetLength:
+    #    return len(self.flushed) + len(self.buffered)
+
+action Init:
+    writer = Writer()
