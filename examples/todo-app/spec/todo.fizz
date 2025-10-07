@@ -1,0 +1,68 @@
+---
+options:
+    max_concurrent_actions: 1
+---
+
+MAX_TODOS = 4
+TODO_VALUES = ("A", "B")
+
+
+role TodoApp:
+    action Init:
+        self.todos = []
+        self.next_id = 1
+
+    atomic action CreateTodo:
+        require len(self.todos) < MAX_TODOS
+        value = any TODO_VALUES
+        todo = record(id=self.next_id, value=value, deleted=False, pinned=False)
+        self.todos.append(todo)
+        self.next_id += 1
+
+    atomic action UpdateTodo:
+        require len(self.todos) > 0
+        idx = any range(len(self.todos))
+        todo = self.todos[idx]
+        require not todo.deleted
+        value = any TODO_VALUES if value != todo.value
+        self.todos[idx].value = value
+
+    atomic action DeleteTodo:
+        require len(self.todos) > 0
+        idx = any range(len(self.todos))
+        todo = self.todos[idx]
+        require not todo.deleted
+        self.todos[idx].deleted = True
+
+    atomic action ReadTodo:
+        require len(self.todos) > 0
+        idx = any range(len(self.todos))
+        todo = self.todos[idx]
+        # Read returns todo if not deleted, else None
+        if not todo.deleted:
+            return todo
+        else:
+            return None
+
+    atomic action ListTodo:
+        # Returns all non-deleted todos in a single page
+        todos = [t for t in self.todos if not t.deleted]
+        return todos
+
+    atomic action PinTodo:
+        require len(self.todos) > 0
+        idx = any range(len(self.todos))
+        todo = self.todos[idx]
+        require not todo.deleted
+        self.todos[idx].pinned = True
+
+    atomic action UnPinTodo:
+        require len(self.todos) > 0
+        idx = any range(len(self.todos))
+        todo = self.todos[idx]
+        require not todo.deleted
+        self.todos[idx].pinned = False
+
+action Init:
+    app = TodoApp()
+
