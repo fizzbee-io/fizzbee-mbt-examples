@@ -26,9 +26,6 @@ role Writer:
         self.buf[k] = v
         _last_put[k] = v
 
-        # if len(buf) > MAX_BUFFER:
-        #     self.flush()
-
     atomic action Get:
         k = any KEYS
         dirty_read = any [False, True]
