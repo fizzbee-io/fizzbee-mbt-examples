@@ -72,3 +72,5 @@ func (c *PGCounter) DeleteCounter() error {
     `, c.name)
 	return err
 }
+
+var _ Counter = (*PGCounter)(nil)

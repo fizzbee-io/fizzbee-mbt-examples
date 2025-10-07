@@ -7,6 +7,7 @@ import (
 	"context"
 	"database/sql"
 	simplecounter "fizzbee-mbt-quickstart"
+	"flag"
 
 	mbt "github.com/fizzbee-io/fizzbee/mbt/lib/go"
 	"github.com/google/uuid"
@@ -17,7 +18,7 @@ import (
 
 // CounterRoleAdapter is a stub adaptor for CounterRole
 type CounterRoleAdapter struct {
-	counter *simplecounter.PGCounter
+	counter simplecounter.Counter
 }
 
 // Assert that CounterRoleAdapter satisfies CounterRole
@@ -71,14 +72,19 @@ func (m *CounterModelAdapter) GetRoles() (map[mbt.RoleId]mbt.Role, error) {
 }
 
 func (m *CounterModelAdapter) Init() error {
-	ctx := context.Background()
-	db, err := sql.Open("postgres", "postgres://postgres:mysecretpassword@localhost:5432/postgres?sslmode=disable")
-	if err != nil {
-		return err
-	}
-	counter, err := simplecounter.NewPGCounter(ctx, db, "counter-"+uuid.New().String(), 3)
-	if err != nil {
-		return err
+	var counter simplecounter.Counter
+	if useMemCounter {
+		counter = simplecounter.NewMemCounter(3)
+	} else {
+		ctx := context.Background()
+		db, err := sql.Open("postgres", "postgres://postgres:mysecretpassword@localhost:5432/postgres?sslmode=disable")
+		if err != nil {
+			return err
+		}
+		counter, err = simplecounter.NewPGCounter(ctx, db, "counter-"+uuid.New().String(), 3)
+		if err != nil {
+			return err
+		}
 	}
 	m.counterRole = &CounterRoleAdapter{
 		counter: counter,
@@ -87,9 +93,17 @@ func (m *CounterModelAdapter) Init() error {
 }
 
 func (m *CounterModelAdapter) Cleanup() error {
-	if m.counterRole != nil {
-		m.counterRole.counter.DeleteCounter()
-		m.counterRole.counter.Close()
+	if m.counterRole != nil && !useMemCounter {
+		pgCounter := m.counterRole.counter.(*simplecounter.PGCounter)
+		pgCounter.DeleteCounter()
+		pgCounter.Close()
 	}
 	return nil
+}
+
+var useMemCounter bool
+
+func init() {
+	// define a flag to choose whether MemCounter or PGCounter is used
+	flag.BoolVar(&useMemCounter, "use-mem-counter", false, "Use in-memory counter instead of PostgreSQL")
 }

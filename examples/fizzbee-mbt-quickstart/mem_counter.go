@@ -1,6 +1,9 @@
 package simplecounter
 
-import "sync"
+import (
+	"context"
+	"sync"
+)
 
 type MemCounter struct {
 	mu sync.Mutex
@@ -15,22 +18,27 @@ func NewMemCounter(limit int) *MemCounter {
 	return &MemCounter{limit: limit}
 }
 
-func (c *MemCounter) Inc() {
+func (c *MemCounter) Inc(_ context.Context) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if c.value < c.limit {
 		c.value++
 	}
+	return nil
 }
-func (c *MemCounter) Dec() {
+
+func (c *MemCounter) Dec(_ context.Context) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if c.value > 0 {
 		c.value--
 	}
+	return nil
 }
-func (c *MemCounter) Get() int {
+func (c *MemCounter) Get(_ context.Context) (int, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	return c.value
+	return c.value, nil
 }
+
+var _ Counter = (*MemCounter)(nil)
