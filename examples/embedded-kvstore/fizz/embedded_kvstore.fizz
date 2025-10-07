@@ -1,0 +1,107 @@
+---
+deadlock_detection: false
+options:
+    crash_on_yield: false
+action_options:
+    "Writer.Put":
+        max_actions: 3
+    "Writer.Flush":
+        max_concurrent_actions: 1
+---
+
+NOT_FOUND="NOT_FOUND"
+KEYS = ["k0", "k1"]
+VALUES = [NOT_FOUND, "v0", "v1"]
+
+role Writer:
+    action Init:
+        self.buf = {}
+        self.immutable_buf = {}
+        self.next_index = 1
+       
+    atomic action Put:
+        k = any KEYS
+        v = any VALUES
+
+        self.buf[k] = v
+        _last_put[k] = v
+
+    atomic action Get:
+        k = any KEYS
+        dirty_read = any [False, True]
+        v = self.get(k, dirty_read)
+        return v
+
+
+    atomic func get(k, dirty_read):
+        if dirty_read:
+            if k in self.buf:
+                return self.buf[k]
+            if k in self.immutable_buf:
+                return self.immutable_buf[k]
+        for i in reversed(range(1, self.next_index)):
+            data = store.Read(self.filename(i))
+            if data and k in data:
+                return data[k]
+        return NOT_FOUND
+
+    fair action Flush:
+        self.freeze()
+        self.write()
+        self.immutable_buf = {}
+  
+    atomic func freeze():
+        if not self.buf or self.immutable_buf:
+            return
+        self.immutable_buf = self.buf
+        self.buf = {}
+
+    atomic func write():
+        if not self.immutable_buf:
+            return
+        store.Write(self.filename(self.next_index), self.immutable_buf)
+        self.next_index += 1
+
+    def filename(self, i):
+        return "data/" + format_with_leading_zeros(i) + ".sst"
+
+role Storage:
+    action Init:
+        self.data = {} # dict of filename: contents
+
+    atomic func Write(filename, content):
+        self.data[filename] = content
+
+    atomic func Read(filename):
+        return self.data.get(filename, {})
+
+action Init:
+    store = Storage()
+    writer = Writer()
+
+    # Used only for assertion
+    _last_put = {}
+
+
+always assertion DirtyRead:
+    for k in KEYS:
+        actual = writer.get(k, True)
+        if actual != _last_put.get(k, NOT_FOUND):
+            return False
+    return True
+
+eventually always assertion DurableRead:
+    for k in KEYS:
+        actual = writer.get(k, False)
+        if actual != _last_put.get(k, NOT_FOUND):
+            return False
+    return True
+
+def format_with_leading_zeros(n, width=4):
+    """
+    Helper function to format integer with leading zeros. 
+    Starlark doesn't support python's format strings yet.
+    """
+    s = str(n)
+    return "0" * (width - len(s)) + s
+    
