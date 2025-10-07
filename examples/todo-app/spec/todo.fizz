@@ -1,8 +1,3 @@
----
-options:
-    max_concurrent_actions: 1
----
-
 MAX_TODOS = 4
 TODO_VALUES = ("A", "B")
 
