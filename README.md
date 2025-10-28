@@ -5,9 +5,11 @@ This repo contains various examples for model based testing with FizzBee.
 
 To get started, see the [Quick Start](https://fizzbee.io/testing/tutorials/quick-start/) guide.
 
-| Example                                                     | language | Description                                                               |
-|-------------------------------------------------------------|----------|---------------------------------------------------------------------------|
-| [fizzbee-mbt-quickstart](./examples/fizzbee-mbt-quickstart) | Go       | Final code from the fizzbee-mbt-quickstart guide including all exercises. |
-| [buffered-writer](./examples/buffered-writer)               | Go       | Shows how non-deterministic choices in the spec are mapped to the SUT.    |
-| [embedded-kvstore](./examples/embedded-kvstore)             | Go       | More realistic example, testing a non-linearizable kvstore database       |
+| Example                                                     | language | Description                                                                             |
+|-------------------------------------------------------------|----------|-----------------------------------------------------------------------------------------|
+| [fizzbee-mbt-quickstart](./examples/fizzbee-mbt-quickstart) | Go       | Final code from the fizzbee-mbt-quickstart Go guide including all exercises.            |
+| [fizzbee-mbt-quickstart-java](./examples/fizzbee-mbt-quickstart-java) | Java     | Final code from the fizzbee-mbt-quickstart Java guide including all exercises.          |
+| [buffered-writer](./examples/buffered-writer)               | Go       | Shows how non-deterministic choices in the spec are mapped to the SUT.                  |
+| [embedded-kvstore](./examples/embedded-kvstore)             | Go       | More realistic example, testing a non-linearizable kvstore database                     |
+| [todo-app](./examples/todo-app)                             | Java     | UI testing for a [todo app](https://github.com/Horlerdipo/todo-golang) using playwright |
 
