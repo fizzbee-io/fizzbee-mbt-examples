@@ -13,6 +13,13 @@ plugins {
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+    // JitPack for FizzBee MBT library
+    maven { url 'https://jitpack.io' }
+}
+
+configurations {
+    fizztestImplementation.extendsFrom testImplementation
+    fizztestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
 dependencies {
@@ -26,6 +33,9 @@ dependencies {
 
     // postgres
     implementation 'org.postgresql:postgresql:42.6.0'
+
+    // At present, the MBT Java library is not tagged, so using the commit hash.
+    fizztestImplementation 'com.github.fizzbee-io:fizzbee:35ff23aa60fa6a5d74bdda3c3bc3e51f7018acd7'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -43,4 +53,34 @@ application {
 tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+}
+
+sourceSets {
+    fizztest {
+        java {
+            srcDir 'src/fizztest/java'
+        }
+        resources {
+            srcDir 'src/fizztest/resources'
+        }
+        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+        runtimeClasspath += output + compileClasspath
+    }
+}
+
+
+tasks.register('fizztest', Test) {
+    description = 'Runs FizzBee model-based tests.'
+    group = 'verification'
+    testClassesDirs = sourceSets.fizztest.output.classesDirs
+    classpath = sourceSets.fizztest.runtimeClasspath
+    shouldRunAfter test
+
+    useJUnitPlatform()  // 👈 Required for JUnit 5
+
+    testLogging {
+        exceptionFormat = 'full'
+        events = ["passed", "failed", "skipped", "standard_out", "standard_error"]
+        showStandardStreams = true
+    }
 }
