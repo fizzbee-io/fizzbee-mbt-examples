@@ -1,4 +1,5 @@
-MAX_TODOS = 4
+MAX_TODOS = 3
+MAX_PINNED = 1
 TODO_VALUES = ("A", "B")
 
 
@@ -16,23 +17,23 @@ role TodoApp:
 
     atomic action UpdateTodo:
         require len(self.todos) > 0
-        idx = any range(len(self.todos))
-        todo = self.todos[idx]
+        id = any range(1, len(self.todos) + 1)
+        todo = self.todos[id-1]
         require not todo.deleted
         value = any TODO_VALUES if value != todo.value
-        self.todos[idx].value = value
+        self.todos[id-1].value = value
 
     atomic action DeleteTodo:
         require len(self.todos) > 0
-        idx = any range(len(self.todos))
-        todo = self.todos[idx]
+        id = any range(1, len(self.todos) + 1)
+        todo = self.todos[id-1]
         require not todo.deleted
-        self.todos[idx].deleted = True
+        self.todos[id-1].deleted = True
 
     atomic action ReadTodo:
         require len(self.todos) > 0
-        idx = any range(len(self.todos))
-        todo = self.todos[idx]
+        id = any range(1, len(self.todos) + 1)
+        todo = self.todos[id-1]
         # Read returns todo if not deleted, else None
         if not todo.deleted:
             return todo
@@ -45,18 +46,18 @@ role TodoApp:
         return todos
 
     atomic action PinTodo:
-        require len(self.todos) > 0
-        idx = any range(len(self.todos))
-        todo = self.todos[idx]
+        require len(self.todos) > 0 and not any([1 for t in self.todos if t.pinned and not t.deleted])
+        id = any range(1, len(self.todos) + 1)
+        todo = self.todos[id-1]
         require not todo.deleted
-        self.todos[idx].pinned = True
+        self.todos[id-1].pinned = True
 
     atomic action UnPinTodo:
         require len(self.todos) > 0
-        idx = any range(len(self.todos))
-        todo = self.todos[idx]
+        id = any range(1, len(self.todos) + 1)
+        todo = self.todos[id-1]
         require not todo.deleted
-        self.todos[idx].pinned = False
+        self.todos[id-1].pinned = False
 
 action Init:
     app = TodoApp()
