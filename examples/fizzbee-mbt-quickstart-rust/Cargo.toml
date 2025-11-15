@@ -1,0 +1,12 @@
+[package]
+name = "fizzbee-mbt-quickstart-rust"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+async-trait = "0.1"
+fizzbee-mbt = { path = "../../../fizzbee/mbt/lib/rust/" }
+
+#[[test]]
+#name = "dummy_counter_test"
+#path = "fizztests/dummy_counter_test.rs"
