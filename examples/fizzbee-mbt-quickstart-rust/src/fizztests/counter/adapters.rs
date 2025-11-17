@@ -1,5 +1,5 @@
 // Generated scaffold by fizzbee-mbt generator
-// Source: ../../../Users/jp/src/fizzbee-mbt-examples/examples/fizzbee-mbt-quickstart/specs/simple-counter/counter.fizz
+// Source: ../../../../fizzbee-mbt-quickstart/specs/simple-counter/counter.fizz
 // Update the methods with your implementation.
 
 use fizzbee_mbt::config::TestOptions;
@@ -9,10 +9,10 @@ use fizzbee_mbt::types::Arg;
 use fizzbee_mbt::value::Value;
 use std::sync::Arc;
 use async_trait::async_trait;
-
-use crate::counter::BadMemCounter as MemCounter; // Your system under test (SUT)
-
 use super::traits::*;
+
+// use crate::counter::BadMemCounter as MemCounter; // Your system under test (SUT)
+use crate::counter::GoodMemCounter as MemCounter; // Your system under test (SUT)
 
 // Role adapters
 
@@ -49,27 +49,20 @@ impl CounterRoleAdapter {
 
 // Model adapter
 pub struct CounterModelAdapter {
-    // TODO: Add fields for your model state and roles
     counter_roles: Vec<Arc<CounterRoleAdapter>>,
     
 }
 
-// Assert that CounterModelAdapter satisfies CounterModel
 impl CounterModel for CounterModelAdapter {
     type R0 = CounterRoleAdapter;
     fn get_counter_roles(&self) -> Result<Vec<Arc<Self::R0>>, MbtError> {
         // TODO: implement get_counter_roles
         Ok(self.counter_roles.clone().into_iter().map(|r| r as Arc<Self::R0>).collect())
     }
-    
-
-    
-    
 }
 
 #[async_trait]
 impl Model for CounterModelAdapter {
-    // TODO: Implement async GetState, Init, and Cleanup methods
     async fn init(&mut self) -> Result<(), MbtError> {
         // TODO: implement Init
         self.counter_roles.push(Arc::new(CounterRoleAdapter::new()));
