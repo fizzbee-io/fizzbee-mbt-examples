@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 async-trait = "0.1"
-fizzbee-mbt = { path = "../../../fizzbee/mbt/lib/rust/" }
+fizzbee-mbt = "0.1"
 
 #[[test]]
 #name = "dummy_counter_test"
