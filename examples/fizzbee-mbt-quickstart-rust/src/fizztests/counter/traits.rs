@@ -7,6 +7,8 @@ use fizzbee_mbt::value::Value;
 use std::sync::Arc;
 use async_trait::async_trait;
 
+// Role traits
+
 #[async_trait]
 pub trait CounterRole: AsyncRole {
     async fn action_inc(&self, args: &[Arg]) -> Result<Value, MbtError>;
@@ -14,7 +16,12 @@ pub trait CounterRole: AsyncRole {
     async fn action_dec(&self, args: &[Arg]) -> Result<Value, MbtError>;
 }
 
+
+// Model trait
 pub trait CounterModel: Model {
-    type R: CounterRole;
-    fn get_counter_roles(&self) -> Result<Vec<Arc<Self::R>>, MbtError>;
+    // R0 is the trait for the CounterRole
+    type R0: CounterRole;
+    fn get_counter_roles(&self) -> Result<Vec<Arc<Self::R0>>, MbtError>;
+
+    // Top-level actions
 }
