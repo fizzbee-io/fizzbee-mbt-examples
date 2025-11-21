@@ -79,7 +79,7 @@ action Init:
     store = Storage()
     writer = Writer()
 
-    # Used only for assertion
+    # Used only for assertion, not actually part if the implementation
     _last_put = {}
 
 

@@ -9,8 +9,9 @@ To get started, see the [Quick Start](https://fizzbee.io/testing/tutorials/quick
 |-------------------------------------------------------------|----------|-----------------------------------------------------------------------------------------|
 | [fizzbee-mbt-quickstart](./examples/fizzbee-mbt-quickstart) | Go       | Final code from the fizzbee-mbt-quickstart Go guide including all exercises.            |
 | [fizzbee-mbt-quickstart-java](./examples/fizzbee-mbt-quickstart-java) | Java     | Final code from the fizzbee-mbt-quickstart Java guide including all exercises.          |
+| [fizzbee-mbt-quickstart-java](./examples/fizzbee-mbt-quickstart-rust) | Rust     | Final code from the fizzbee-mbt-quickstart Rust guide including all exercises.          |
 | [buffered-writer](./examples/buffered-writer)               | Go       | Shows how non-deterministic choices in the spec are mapped to the SUT.                  |
-| [embedded-kvstore](./examples/embedded-kvstore)             | Go       | More realistic example, testing a non-linearizable kvstore database                     |
+| [embedded-kvstore](./examples/embedded-kvstore)             | Go, Rust | More realistic example, testing a non-linearizable kvstore database                     |
 | [todo-app](./examples/todo-app)                             | Java     | UI testing for a [todo app](https://github.com/Horlerdipo/todo-golang) using playwright |
 
 # Install FizzBee and FizzBee-MBT
@@ -82,3 +83,20 @@ For example in gradle,
 ```
 Look at the jitpack link for the latest version and the instructions for your build system.
 
+## Rust
+Run the scaffolding command to generate the test skeleton and the adapter code.
+```bash
+fizz mbt-scaffold  \
+        --lang java \
+        --gen-adapter \
+        --out-dir fizztest/ \
+        specs/simple-counter/counter.fizz     # The path to the fizz spec file
+```
+The [shared libraries are distributed via jitpack](https://jitpack.io/#fizzbee-io/fizzbee/).
+For example in gradle,
+```
+	dependencies {
+	        implementation 'com.github.fizzbee-io:fizzbee:v0.3.0'
+	}
+```
+Look at the jitpack link for the latest version and the instructions for your build system.
