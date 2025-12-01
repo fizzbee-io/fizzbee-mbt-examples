@@ -87,16 +87,7 @@ Look at the jitpack link for the latest version and the instructions for your bu
 Run the scaffolding command to generate the test skeleton and the adapter code.
 ```bash
 fizz mbt-scaffold  \
-        --lang java \
+        --lang rust \
         --gen-adapter \
-        --out-dir fizztest/ \
+        --out-dir src/fizztests/ \
         specs/simple-counter/counter.fizz     # The path to the fizz spec file
-```
-The [shared libraries are distributed via jitpack](https://jitpack.io/#fizzbee-io/fizzbee/).
-For example in gradle,
-```
-	dependencies {
-	        implementation 'com.github.fizzbee-io:fizzbee:v0.3.0'
-	}
-```
-Look at the jitpack link for the latest version and the instructions for your build system.
