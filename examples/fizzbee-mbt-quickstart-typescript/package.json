@@ -6,7 +6,9 @@
     "build": "tsc",
     "start": "node dist/main.js",
     "dev": "tsc && node dist/main.js",
-    "test": "node dist/fizztests/counter_test.js"
+    "test": "node dist/fizztests/counter_test.js",
+    "test:mem": "node dist/fizztests/counter_test.js --use-mem-counter",
+    "test:pg": "node dist/fizztests/counter_test.js"
   },
   "dependencies": {
     "@fizzbee/mbt": "file:/Users/jp/src/fizzbee/mbt/lib/typescript",
