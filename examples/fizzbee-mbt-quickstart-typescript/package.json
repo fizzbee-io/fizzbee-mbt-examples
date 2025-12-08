@@ -5,9 +5,11 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/main.js",
-    "dev": "tsc && node dist/main.js"
+    "dev": "tsc && node dist/main.js",
+    "test": "node dist/fizztests/counter_test.js"
   },
   "dependencies": {
+    "@fizzbee/mbt": "file:/Users/jp/src/fizzbee/mbt/lib/typescript",
     "pg": "^8.11.3"
   },
   "devDependencies": {
