@@ -1,0 +1,20 @@
+{
+  "name": "todo-app-typescript",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "node dist/todo_test.js"
+  },
+  "dependencies": {
+    "@fizzbee/mbt": "file:/Users/jp/src/fizzbee/mbt/lib/typescript",
+    "@playwright/test": "^1.40.0",
+    "playwright": "^1.40.0",
+    "better-sqlite3": "^9.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "@types/better-sqlite3": "^7.6.8",
+    "typescript": "^5.3.3"
+  }
+}
