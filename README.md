@@ -10,7 +10,7 @@ To get started, see the [Quick Start](https://fizzbee.io/testing/tutorials/quick
 | [fizzbee-mbt-quickstart](./examples/fizzbee-mbt-quickstart) | Go, Java, Rust, TypeScript | Final code from the fizzbee-mbt-quickstart guide including all exercises in multiple languages. |
 | [buffered-writer](./examples/buffered-writer)               | Go       | Shows how non-deterministic choices in the spec are mapped to the SUT.                  |
 | [embedded-kvstore](./examples/embedded-kvstore)             | Go, Rust | More realistic example, testing a non-linearizable kvstore database                     |
-| [todo-app](./examples/todo-app)                             | Java, TypeScript     | UI testing for a [todo app](https://github.com/Horlerdipo/todo-golang) using playwright |
+| [todo-app](./examples/todo-app)                             | Java, TypeScript     | UI testing for a [todo app](https://github.com/Horlerdipo/todo-golang) using playwright in multiple languages. |
 
 # Install FizzBee and FizzBee-MBT
 
