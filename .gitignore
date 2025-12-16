@@ -30,3 +30,22 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# Backup/experimental quickstart directories
+**/fizzbee-mbt-quickstart[0-9]*/
+**/fizzbee-mbt-quickstart-java[0-9]*/
+**/fizzbee-mbt-quickstart-rust[0-9]*/
+**/fizzbee-mbt-quickstart-typescript[0-9]*/
+
+# OS files
+.DS_Store
+
+# Build artifacts
+**/out/
+**/target/
+**/.gradle/
+**/build/
+**/node_modules/
+
+# IDE
+.idea/
