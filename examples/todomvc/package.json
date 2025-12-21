@@ -1,0 +1,18 @@
+{
+  "name": "todomvc-playwright-mbt",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "node dist/todomvc_test.js"
+  },
+  "dependencies": {
+    "@fizzbee/mbt": "^0.1.1",
+    "@playwright/test": "^1.40.0",
+    "playwright": "^1.40.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "typescript": "^5.3.3"
+  }
+}

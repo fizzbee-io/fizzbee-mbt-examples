@@ -11,6 +11,7 @@ To get started, see the [Quick Start](https://fizzbee.io/testing/tutorials/quick
 | [buffered-writer](./examples/buffered-writer)               | Go       | Shows how non-deterministic choices in the spec are mapped to the SUT.                  |
 | [embedded-kvstore](./examples/embedded-kvstore)             | Go, Rust | More realistic example, testing a non-linearizable kvstore database                     |
 | [todo-app](./examples/todo-app)                             | Java, TypeScript     | UI testing for a [todo app](https://github.com/Horlerdipo/todo-golang) using playwright in multiple languages. |
+| [todomvc](./examples/todomvc/)                              | TypeScript | Playwright UI testing example for the standard [TodoMVC](https://todomvc.com) application. |
 
 # Install FizzBee and FizzBee-MBT
 
@@ -89,3 +90,14 @@ fizz mbt-scaffold  \
         --gen-adapter \
         --out-dir src/fizztests/ \
         specs/simple-counter/counter.fizz     # The path to the fizz spec file
+```
+
+## TypeScript
+Run the scaffolding command to generate the test skeleton and the adapter code.
+```bash
+fizz mbt-scaffold  \
+        --lang typescript \
+        --gen-adapter \
+        --out-dir src/fizztests/ \
+        specs/simple-counter/counter.fizz     # The path to the fizz spec file
+```
