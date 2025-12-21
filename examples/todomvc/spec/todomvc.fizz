@@ -1,0 +1,135 @@
+---
+deadlock_detection: false
+options:
+    max_concurrent_actions: 1
+action_options:
+    "TodoView.UserAddsItem":
+        max_actions: 3
+---
+
+# --- Constants ---
+MAX_ITEMS = 3
+TODO_STRINGS = ("Buy milk", "Walk dog", "Write spec")
+
+FilterState = enum("All", "Active", "Completed")
+ToggleAllStatus = enum("NotShown", "Unchecked", "Checked")
+
+# Matches todoModel.ts logic
+role TodoModel:
+    action Init:
+        self.todos = {}
+        self.next_id = 0
+
+    atomic func AddTodo(title):
+        require self.next_id < MAX_ITEMS
+        self.todos[self.next_id] = record(id=self.next_id, title=title, completed=False)
+        self.next_id += 1
+
+    atomic func Toggle(target_id):
+        item = self.todos[target_id]
+        self.todos[target_id] = record(id=item.id, title=item.title, completed=not item.completed)
+
+    atomic func ToggleAll(checked):
+        for id in self.todos.keys():
+            item = self.todos[id]
+            self.todos[id] = record(id=item.id, title=item.title, completed=checked)
+
+    atomic func Destroy(target_id):
+        self.todos.pop(target_id)
+
+    atomic func Save(target_id, new_text):
+        item = self.todos[target_id]
+        self.todos[target_id] = record(id=item.id, title=new_text, completed=item.completed)
+
+    atomic func ClearCompleted():
+        self.todos = {id:t for id,t in self.todos.items() if not t.completed}
+
+# Matches app.tsx (View + Controller)
+role TodoView:
+    action Init:
+        self.nowShowing = FilterState.All
+        self.shownTodos = []
+        self.activeTodoCount = 0
+        self.toggleAllStatus = ToggleAllStatus.NotShown
+        self.clearButtonShown = False
+        # self.update_ui_state()
+
+    # Pure logic to update fields representing the UI state (derived from Model)
+    atomic func update_ui_state():
+        all_todos = model.todos.values()
+        
+        # 1. Todo Items based on current filter (shownTodos)
+        if self.nowShowing == FilterState.All:
+            self.shownTodos = all_todos
+        elif self.nowShowing == FilterState.Active:
+            self.shownTodos = [t for t in all_todos if not t.completed]
+        elif self.nowShowing == FilterState.Completed:
+            self.shownTodos = [t for t in all_todos if t.completed]
+            
+        # 2. activeTodoCount
+        self.activeTodoCount = len([t for t in all_todos if not t.completed])
+        completedCount = len(all_todos) - self.activeTodoCount
+
+        # 3. toggleAllStatus
+        if len(all_todos) == 0:
+            self.toggleAllStatus = ToggleAllStatus.NotShown
+        elif self.activeTodoCount != 0:
+            self.toggleAllStatus = ToggleAllStatus.Unchecked
+        else:
+            self.toggleAllStatus = ToggleAllStatus.Checked
+
+        # 4. clearButtonShown
+        self.clearButtonShown = completedCount > 0
+
+    # --- Controller Actions ---
+
+    atomic action UserSwitchesFilter:
+        require model.todos
+        new_filter = any dir(FilterState) if self.nowShowing != new_filter
+        self.nowShowing = new_filter
+        self.update_ui_state()
+
+    atomic action UserAddsItem:
+        require len(model.todos) < MAX_ITEMS
+        title = any TODO_STRINGS
+        model.AddTodo(title)
+        self.update_ui_state()
+
+    atomic action UserTogglesItem:
+        require len(self.shownTodos) > 0
+        index = any range(len(self.shownTodos))
+        target = self.shownTodos[index]
+        model.Toggle(target.id)
+        self.update_ui_state()
+
+    atomic action UserTogglesAll:
+        require self.toggleAllStatus != ToggleAllStatus.NotShown
+        # Logic: if currently Checked (all done), uncheck all. 
+        # If currently Unchecked (any active), check all.
+        model.ToggleAll(self.toggleAllStatus == ToggleAllStatus.Unchecked)
+        self.update_ui_state()
+
+    atomic action UserDeletesItem:
+        require len(self.shownTodos) > 0
+        index = any range(len(self.shownTodos))
+        target = self.shownTodos[index]
+        model.Destroy(target.id)
+        self.update_ui_state()
+
+    atomic action UserEditsItem:
+        require len(self.shownTodos) > 0
+        index = any range(len(self.shownTodos))
+        target = self.shownTodos[index]
+        new_text = any TODO_STRINGS
+        model.Save(target.id, new_text)
+        self.update_ui_state()
+
+    atomic action UserClearsCompleted:
+        require self.clearButtonShown
+        model.ClearCompleted()
+        self.update_ui_state()
+
+# --- Entry Point ---
+action Init:
+    model = TodoModel()
+    view = TodoView()
