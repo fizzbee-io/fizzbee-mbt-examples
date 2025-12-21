@@ -9,8 +9,11 @@ export interface TodoModelRole extends Role {
 }
 
 export interface TodoViewRole extends Role {
-  actionUserSwitchesFilter(args: Arg[]): Promise<any>;
+}
+
+export interface TodoControllerRole extends Role {
   actionUserAddsItem(args: Arg[]): Promise<any>;
+  actionUserSwitchesFilter(args: Arg[]): Promise<any>;
   actionUserTogglesItem(args: Arg[]): Promise<any>;
   actionUserTogglesAll(args: Arg[]): Promise<any>;
   actionUserDeletesItem(args: Arg[]): Promise<any>;
