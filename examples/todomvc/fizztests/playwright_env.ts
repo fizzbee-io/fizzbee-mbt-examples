@@ -16,8 +16,8 @@ export class PlaywrightEnv {
 
   static async create(): Promise<PlaywrightEnv> {
     const browser = await chromium.launch({
-      headless: false,  // Uncomment to see the browser
-      slowMo: 300       // Uncomment to slow down actions
+      // headless: false,  // Uncomment to see the browser
+      // slowMo: 300       // Uncomment to slow down actions
     });
     const context = await browser.newContext({
       // recordVideo: {
