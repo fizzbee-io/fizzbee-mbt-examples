@@ -5,55 +5,8 @@
 import { Arg, NotImplementedError, StateGetter, AfterActionHook, IGNORE } from '@fizzbee/mbt';
 import { waitForDOMSettled } from '@fizzbee/mbt/playwright';
 import { TodoModelRole, TodoViewRole, TodoControllerRole, TodomvcModel } from './todomvc_interfaces.js';
-import { chromium, Browser, BrowserContext, Page } from 'playwright';
-;
-
-// ============================================================================
-// Playwright Environment - Manages browser and context lifecycle
-// ============================================================================
-
-class PlaywrightEnv {
-  private browser?: Browser;
-  private context?: BrowserContext;
-
-  async init(): Promise<void> {
-    this.browser = await chromium.launch({
-      // headless: false,  // Uncomment to see the browser
-      // slowMo: 300       // Uncomment to slow down actions
-    });
-    this.context = await this.browser.newContext({
-      // recordVideo: {
-      //   dir: '/tmp/playwright-videos/',
-      //   size: { width: 1280, height: 720 }
-      // }
-    });
-  }
-
-  async createPage(): Promise<Page> {
-    if (!this.context) {
-      throw new Error('PlaywrightEnv not initialized. Call init() first.');
-    }
-    const page = await this.context.newPage();
-    await page.goto('https://demo.playwright.dev/todomvc/#/');
-    return page;
-  }
-
-  async closePage(page: Page): Promise<void> {
-    if (!page.isClosed()) {
-      await page.evaluate(() => window.localStorage.clear());
-      await page.close();
-    }
-  }
-
-  async closeAll(): Promise<void> {
-    if (this.context) {
-      await this.context.close();
-    }
-    if (this.browser) {
-      await this.browser.close();
-    }
-  }
-}
+import { Page } from 'playwright';
+import { PlaywrightEnv } from './playwright_env.js';
 
 // Role adaptors
 
@@ -67,10 +20,6 @@ export class TodoViewRoleAdapter implements TodoViewRole, StateGetter {
   constructor(page: Page) {
     this.page = page;
   }
-
-  // ============================================================================
-  // State Reading Methods - Read the current state of the UI for verification
-  // ============================================================================
 
   async getState(): Promise<Record<string, any>> {
     return {
@@ -213,7 +162,7 @@ export class TodoControllerRoleAdapter implements TodoControllerRole {
 
 // Model adaptor
 export class TodomvcModelAdapter implements TodomvcModel, AfterActionHook {
-  private static playwrightEnv?: PlaywrightEnv;
+  private playwrightEnv?: PlaywrightEnv;
 
   private todomodelRole?: TodoModelRoleAdapter;
   private todoviewRole?: TodoViewRoleAdapter;
@@ -230,13 +179,12 @@ export class TodomvcModelAdapter implements TodomvcModel, AfterActionHook {
 
   async init(): Promise<void> {
     // Initialize Playwright environment once
-    if (!TodomvcModelAdapter.playwrightEnv) {
-      TodomvcModelAdapter.playwrightEnv = new PlaywrightEnv();
-      await TodomvcModelAdapter.playwrightEnv.init();
+    if (!this.playwrightEnv) {
+      this.playwrightEnv = await PlaywrightEnv.create();
     }
 
     // Create a fresh page for each run
-    this.page = await TodomvcModelAdapter.playwrightEnv.createPage();
+    this.page = await this.playwrightEnv.createPage();
 
     // Create role instances with the page
     this.todomodelRole = new TodoModelRoleAdapter();
@@ -246,20 +194,19 @@ export class TodomvcModelAdapter implements TodomvcModel, AfterActionHook {
 
   async afterAction(): Promise<void> {
     if (this.page) {
-      await waitForDOMSettled(this.page);
+      await waitForDOMSettled(this.page, { debounceTimeout: 1 });
     }
   }
 
   async cleanup(): Promise<void> {
-    if (this.page && TodomvcModelAdapter.playwrightEnv) {
-      await TodomvcModelAdapter.playwrightEnv.closePage(this.page);
+    if (this.page && this.playwrightEnv) {
+      await this.playwrightEnv.closePage(this.page);
     }
   }
 
   async cleanupAll(): Promise<void> {
-    if (TodomvcModelAdapter.playwrightEnv) {
-      await TodomvcModelAdapter.playwrightEnv.closeAll();
-      TodomvcModelAdapter.playwrightEnv = undefined;
+    if (this.playwrightEnv) {
+      await this.playwrightEnv.closeAll();
     }
   }
 }
