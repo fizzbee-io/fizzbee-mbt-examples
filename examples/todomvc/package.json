@@ -7,7 +7,7 @@
     "test": "node dist/todomvc_test.js"
   },
   "dependencies": {
-    "@fizzbee/mbt": "^0.1.1",
+    "@fizzbee/mbt": "^0.1.2",
     "@playwright/test": "^1.40.0",
     "playwright": "^1.40.0"
   },
